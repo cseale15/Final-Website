@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="css/layoutstyle.css">
+    <link rel="stylesheet" href="css/mystyles.css">
+    <title>Mini Foosball AR</title>
+    <style>
+        body { background: #2c3e50; display: flex; flex-direction: column; align-items: center; font-family: sans-serif; color: white; margin: 0; overflow: hidden; }
+        canvas { background: #27ae60; border: 5px solid #fff; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.5); cursor: none; margin-top: 20px; }
+        .stats { margin-top: 10px; font-size: 24px; font-weight: bold; }
+        p { font-size: 14px; color: #ecf0f1; }
+    </style>
+</head>
+<body>
+
+    <div class="stats">ARG <span id="p1Score">0</span> - <span id="p2Score">0</span> CPU</div>
+    <canvas id="gameCanvas" width="800" height="500"></canvas>
+    <p>Move your mouse up/down to control the blue rods!</p>
+
+<script>
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+const p1ScoreEl = document.getElementById("p1Score");
+const p2ScoreEl = document.getElementById("p2Score");
+
+let score1 = 0;
+let score2 = 0;
+
+// Ball Object
+const ball = { x: 400, y: 250, radius: 10, dx: 4, dy: 4, speed: 5 };
+
+// Rod/Player Setup (X positions)
+const team1Rods = [100, 350, 600];
+const team2Rods = [200, 450, 700];
+
+let playerY = 250; // Controlled by mouse
+let aiY = 250;     // AI's vertical position
+
+function drawPitch() {
+    // Center Line
+    ctx.strokeStyle = "rgba(255,255,255,0.5)";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(canvas.width/2, 0);
+    ctx.lineTo(canvas.width/2, canvas.height);
+    ctx.stroke();
+    // Goals
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 175, 10, 150);
+    ctx.fillRect(790, 175, 10, 150);
+}
+
+function drawPlayers() {
+    // Draw Blue Team (User)
+    ctx.fillStyle = "#3498db";
+    team1Rods.forEach(x => {
+        for(let i = -1; i <= 1; i++) {
+            let y = playerY + (i * 100);
+            if (y > 20 && y < 480) {
+                ctx.beginPath();
+                ctx.arc(x, y, 15, 0, Math.PI * 2);
+                ctx.fill();
+                checkCollision(x, y);
+            }
+        }
+    });
+
+    // --- NEW AI LOGIC ---
+    // Instead of teleporting to the ball, the AI moves a small percentage towards it every frame.
+    // Change the "0.06" to a lower number (like 0.03) to make the AI slower and easier to beat!
+    aiY += (ball.y - aiY) * 0.06; 
+
+    // Draw Red Team (AI)
+    ctx.fillStyle = "#e74c3c";
+    team2Rods.forEach(x => {
+        for(let i = -1; i <= 1; i++) {
+            let y = aiY + (i * 100);
+            if (y > 20 && y < 480) {
+                ctx.beginPath();
+                ctx.arc(x, y, 15, 0, Math.PI * 2);
+                ctx.fill();
+                checkCollision(x, y);
+            }
+        }
+    });
+}
+
+function checkCollision(px, py) {
+    let dist = Math.hypot(ball.x - px, ball.y - py);
+    if (dist < ball.radius + 15) {
+        ball.dx *= -1.1; // Speed up slightly
+        
+        // --- NEW SPEED CAP LOGIC ---
+        // Prevents the ball from going insanely fast
+        let maxSpeed = 12; 
+        if (Math.abs(ball.dx) > maxSpeed) {
+            ball.dx = ball.dx > 0 ? maxSpeed : -maxSpeed;
+        }
+
+        ball.x += ball.dx; // Prevent sticking to the player
+    }
+}
+
+function update() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawPitch();
+    
+    // Move Ball
+    ball.x += ball.dx;
+    ball.y += ball.dy;
+
+    // Wall Bounces
+    if (ball.y + ball.radius > canvas.height || ball.y - ball.radius < 0) ball.dy *= -1;
+
+    // Score Detection
+    if (ball.x < 0) {
+        if (ball.y > 175 && ball.y < 325) { score2++; resetBall(); }
+        else ball.dx *= -1;
+    }
+    if (ball.x > canvas.width) {
+        if (ball.y > 175 && ball.y < 325) { score1++; resetBall(); }
+        else ball.dx *= -1;
+    }
+
+    p1ScoreEl.innerText = score1;
+    p2ScoreEl.innerText = score2;
+
+    drawPlayers();
+    
+    // Draw Ball
+    ctx.fillStyle = "white";
+    ctx.beginPath();
+    ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+    ctx.fill();
+
+    requestAnimationFrame(update);
+}
+
+function resetBall() {
+    ball.x = 400; ball.y = 250;
+    // Reset to a comfortable starting speed after a goal
+    ball.dx = (Math.random() > 0.5 ? 4 : -4);
+    ball.dy = (Math.random() > 0.5 ? 4 : -4);
+}
+
+canvas.addEventListener("mousemove", (e) => {
+    const rect = canvas.getBoundingClientRect();
+    playerY = e.clientY - rect.top;
+});
+
+update();
+</script>
+</body>
+</html>

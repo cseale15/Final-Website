@@ -1,0 +1,116 @@
+.hero-header{
+  position: relative;
+  height: 400px; /* Adjust height as needed */
+  display: flex;
+  align-items: right;
+  justify-content: center;
+  color: white;
+  overflow: hidden; /* Keeps the blurred edges inside the header */
+}
+
+.hero-header::before {
+  content: "";
+  position: absolute;
+  top: 0; 
+  left: 0;
+  width: 100%; 
+  height: 100%;
+  background-image: url('../images/argentina_worldcup.webp');
+  background-size: cover;
+  background-position: center;
+  
+  /* The Blur Effect */
+  filter: blur(8px);
+  
+  /* Optional: Zoom in slightly to hide the white edges caused by blur */
+  transform: scale(1.1);
+  z-index: -1; /* Pushes the image behind the text */
+}
+
+/* .left-header {
+    position: absolute;
+    top: 0px; /* Adjust as needed */
+    /* left: 120px; Adjust as needed */
+    /* font-size: 1.5em; Adjust as needed */
+   
+/* } */
+
+
+.small-image {
+    width: 100%;
+    height: auto;
+    margin: 10px 0; 
+}
+
+.subheader {
+    margin-top: 60px;
+    font-size: larger; 
+    font-family: 'Times New Roman', Times, serif;
+    font-style: italic;
+    color: #555;
+}
+
+
+.tableauPlaceholder {
+    width: 200%;
+    max-width: 800px;
+    margin: 0 auto;
+    height: 200%; 
+    border: 1px solid #ccc; 
+    border-radius: 10px; 
+    overflow: hidden; 
+    transform: scale(1.0);
+    transform-origin: 0 0;
+}
+
+.column-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 20px;            /* Adds space between columns */
+    margin-top: 20px;      /* Space below your hero header */
+    padding: 0 20px;
+}
+
+.common {
+    position: relative;    /* Changed from absolute */
+    flex: 1;               /* Makes columns equal width */
+    display: flex;
+    flex-direction: column; 
+    align-items: center;   /* THIS CENTERS EVERYTHING IN THE COLUMN */
+    text-align: center;
+    border: 2px solid white;
+    padding: 15px;      
+}
+
+
+.text {
+  text-align: left;            
+  display: inline-block;        
+  margin: 0 auto;
+  color: #2c3e50;
+}
+
+.viz-container {
+    width: 100%;       /* Fill the column */
+    max-width: 600px;  /* This makes it "smaller" as you requested */
+    height: 400px;     /* Forces a smaller height */
+    overflow: hidden;  /* Prevents it from bleeding out */
+    margin: 20px auto; /* Centers it under the video */
+    border: 1px solid #ccc;
+}
+
+.link {
+    color: #ffffff;
+    font-weight: bold;
+    font-style: oblique;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+.title {
+    font-size: 2.5em;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    color: #ffffff;
+    margin-top: 150px;
+    z-index: 1;
+}
